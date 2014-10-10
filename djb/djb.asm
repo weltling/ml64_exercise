@@ -14,17 +14,14 @@
 		push r8
 
 		mov rax,1505h
-		mov rcx,0 ; loop counter
-l0:
-		cmp rdx,rcx
+		xor rcx,rcx ; loop counter
+
+l0:		cmp rdx,rcx
 		je end_l0
 
-		; XXX use a lookup table for this?
-		mov r8,rax
-		shl rax,5
-		add rax,r8
-
 		movzx r8,byte ptr [rdi]
+		add r8,rax
+		shl rax,5
 		add rax,r8
 
 		inc rcx
