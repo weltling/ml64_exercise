@@ -6,8 +6,10 @@
 #include <time.h>
 
 
+/* asm implementation */
 unsigned __int64 djb(const char *str, size_t len);
 
+/* c implementation with unroll */
 static __forceinline unsigned __int64 djb_c(const char *str, size_t len)
 {
         register unsigned __int64 hash = 5381;
@@ -37,6 +39,7 @@ static __forceinline unsigned __int64 djb_c(const char *str, size_t len)
         return hash;
 }
 
+/* simple c implementation */
 /*unsigned __int64 djb_c(const char *str, size_t len)
 {
 	size_t cnt = 0;
@@ -49,6 +52,7 @@ static __forceinline unsigned __int64 djb_c(const char *str, size_t len)
 	return hash;
 }*/
 
+/* helpers */
 void
 init_rand(void)
 {
@@ -70,28 +74,40 @@ init_rand(void)
 }
 
 #define LEN 64
+char *
+get_random_str(size_t *len)
+{
+	char *hello;
+	size_t i;
+
+	*len = LEN;
+	init_rand();
+	//*len = rand();
+
+	hello = (char *)malloc(sizeof(char) * *len);
+
+	for (i = 0; i < *len; i++) {
+		hello[i] = 'A' + (rand() % 26);
+	}
+
+	return hello;
+}
+
+
+/* test */
 
 static void
 testit(double *diff1)
 {
 	char *hello;
+	size_t len;
 	unsigned __int64 h0 = 0, h1 = 0;
-
 	__int64 freq, start, end;
 	double elapsed0, elapsed1;
 	int i = 0;
-	size_t len;
 	FILETIME tod;
 
-	init_rand();
-
-	len = LEN;
-
-	//len = rand()*rand();
-	//len = rand();
-
-	hello = (char *)malloc(sizeof(char) * len);
-	memset(hello, 'X', len);
+	hello = get_random_str(&len);
 
 	if (!QueryPerformanceFrequency((LARGE_INTEGER *)&freq)) {
 		return;
