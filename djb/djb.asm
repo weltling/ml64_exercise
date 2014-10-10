@@ -6,33 +6,27 @@
 		; rcx == char *str 
 		; rdx == size_t len
 
-		push rdi
-
-		mov rdi,rcx
-		push rcx
-
+		push r9
 		push r8
 
 		mov rax,1505h
-		xor rcx,rcx ; loop counter
+		xor r9,r9 ; loop counter
 
-l0:		cmp rdx,rcx
+l0:		cmp rdx,r9
 		je end_l0
 
-		movzx r8,byte ptr [rdi]
+		movzx r8,byte ptr [rcx+r9]
 		add r8,rax
 		shl rax,5
 		add rax,r8
 
-		inc rcx
-		inc rdi
+		inc r9
 
 		jmp l0
 end_l0:		nop
 	
 		pop r8
-		pop rcx
-		pop rdi
+		pop r9
 
 		ret
 
