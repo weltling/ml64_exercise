@@ -80,9 +80,9 @@ get_random_str(size_t *len)
 	char *hello;
 	size_t i;
 
-	*len = LEN;
 	init_rand();
-	//*len = rand();
+	//*len = LEN;
+	*len = rand();
 
 	hello = (char *)malloc(sizeof(char) * *len);
 
