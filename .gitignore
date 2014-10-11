@@ -2,3 +2,5 @@
 *.pgd
 *.pgc
 *.exe
+*.ilk
+*.pdb
