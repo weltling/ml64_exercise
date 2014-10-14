@@ -32,7 +32,7 @@ mult_c(__int64 a, __int64 b, __int64 *lval, double *dval)
 #define REPEAT 128
 
 int
-main(void)
+main(int argc, char **argv)
 {
 
 	__int8 ovfl0, ovfl1;
@@ -47,6 +47,13 @@ main(void)
 	__int64 freq, start, end;
 	__int64 elapsed0, elapsed1;
 
+
+	/*srand((unsigned)time(NULL));
+	for (i = 0; i < TESTS; i++) {
+		val[i] -= rand();
+		val[i] += rand();
+	}*/
+
 	if (!QueryPerformanceFrequency((LARGE_INTEGER *)&freq)) {
 		return;
 	}
@@ -56,14 +63,18 @@ main(void)
 		for (j = 0; j < TESTS; j++) {
 
 			__int64 elapsed_diff;
+			int rnd = rand();
+			if (argc > 1) {
+				rnd += atoi(argv[1]);
+			}
 
 			QueryPerformanceCounter((LARGE_INTEGER *)&start);
-			ovfl0 = mult(val[i], val[j], &iret0, &dret0);
+			ovfl0 = mult(val[i]-rnd, val[j]+rnd, &iret0, &dret0);
 			QueryPerformanceCounter((LARGE_INTEGER *)&end);
 			elapsed0 = end - start;
 
 			QueryPerformanceCounter((LARGE_INTEGER *)&start);
-			ovfl1 = mult_c(val[i], val[j], &iret1, &dret1);
+			ovfl1 = mult_c(val[i]-rnd, val[j]+rnd, &iret1, &dret1);
 			QueryPerformanceCounter((LARGE_INTEGER *)&end);
 			elapsed1 = end - start;
 

@@ -7,18 +7,17 @@
 		; r8  == __int64 *lret
 		; xmm0 == double *dret
 
-		mov	rax,rcx
-		mov	r10,rdx
-		push rdx ; imul stores result into rdx
-		imul	r10
-		pop	rdx
+		push	rdx ; imul stores result into rdx
+		imul	rdx,rcx
 
 		jo	ovfl
 ok:
-		mov	[r8],rax
+		mov	[r8],rdx
 		xor	rax,rax
+		pop	rdx
 		jmp	done
 ovfl:
+		pop	rdx
 		cvtsi2sd	xmm0,rdx
 		cvtsi2sd	xmm1,rcx
 		mulsd	xmm0,xmm1
