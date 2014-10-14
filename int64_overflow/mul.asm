@@ -17,7 +17,7 @@
 ok:
 		mov	[r8],rax
 		xor	rax,rax
-		jmp	out0
+		jmp	done
 ovfl:
 		cvtsi2sd	xmm0,rdx
 		cvtsi2sd	xmm1,rcx
@@ -26,7 +26,7 @@ ovfl:
 		movsd	qword ptr[r9],xmm0		
 
 		mov rax,1
-out0:
+done:
 		ret
 	mult endp
 end
