@@ -5,7 +5,7 @@
 		; rcx == __int64 a
 		; rdx == __int64 b
 		; r8  == __int64 *lret
-		; xmm0 == double *dret
+		; r9  == double *dret
 
 		push	rdx ; imul stores result into rdx
 		imul	rdx,rcx
