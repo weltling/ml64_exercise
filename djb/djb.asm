@@ -20,7 +20,7 @@ l0:		cmp rdx,r9
 		shl rax,5
 		add rax,r8
 
-		inc r9
+		add r9,1
 
 		jmp l0
 end_l0:		nop
