@@ -12,9 +12,10 @@
 		mov rax,1505h
 		xor r9,r9 ; loop counter
 
-l0:		cmp rdx,r9
+		cmp rdx,r9
 		je end_l0
 
+l0:
 		movzx r8,byte ptr [rcx+r9]
 		add r8,rax
 		shl rax,5
@@ -22,7 +23,8 @@ l0:		cmp rdx,r9
 
 		add r9,1
 
-		jmp l0
+		cmp rdx,r9
+		jne l0
 end_l0:		nop
 	
 		pop r8
