@@ -1,5 +1,19 @@
 
 .code
+	mult_qWord proc
+        
+			xor eax,eax
+			cvtsi2sd xmm0,rcx
+			cvtsi2sd xmm1,rdx
+			imul rcx,rdx
+			mulsd xmm0,xmm1
+			mov [r8],rcx
+			movsd real8 ptr [r9],xmm0
+			jno @NOF
+			xor eax,1			; integer overflow -> rax = 1
+	@NOF:   ret
+	mult_qWord endp
+
 	mult proc
 
 		; rcx == __int64 a
