@@ -10,17 +10,17 @@
 		jo ofl
 		add rax,r8
 		jo ofl
-		jmp nofl
+
+	nofl:
+		mov r10,0
+		mov [r9],r10
+		jmp done
 
 	ofl:
 		xor rax,rax
 		mov r10,1
 		mov [r9],r10
 		
-	nofl:
-		mov r10,0
-		mov [r9],r10
-
 	done:
 		ret
 	safe_address endp
