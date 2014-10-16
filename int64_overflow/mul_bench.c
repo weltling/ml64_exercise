@@ -192,7 +192,7 @@ main(int argc, char **argv)
 		}
 	}
 
-	printf("\n\nmean elapsed_asm - elapsed_c=%.7f ticks\n", sum/(double)(TESTS*TESTS));
+	printf("\n\nmean elapsed_asm - elapsed_c=%.7f ticks\n", sum/(double)(TESTS*TESTS*repeat));
 
 	return 0;
 }
