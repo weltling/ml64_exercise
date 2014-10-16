@@ -3,9 +3,46 @@
 #include <limits.h>
 #include <time.h>
 #include <windows.h>
+#include <intrin.h>
 
 /* asm implementation */
+//__int8 int64_mul_ovfl(__int64 a, __int64 b, __int64 *lval);
+
 __int8 mult(__int64 a, __int64 b, __int64 *lval, double *dval);
+/* XXX in further some tries to embed a mixed c variant, not used however */
+
+/*{
+	__int8 ovfl;
+
+	ovfl = int64_mul_ovfl(a, b, lval);
+
+	if (ovfl) {
+		*dval = (double)a * (double)b;
+	}
+
+	return ovfl;
+}*/
+
+/*{
+	__m128d ad, bd, rd;
+	__debugbreak();
+	__int8 ovfl = 0;
+
+	ad = _mm_cvtsi64_ss(ad, a);
+	bd = _mm_cvtsi64_ss(bd, b);
+	rd = _mm_mul_ss(ad, bd);
+
+	//ovfl = rd > _I64_MAX || rd < _I64_MIN;
+
+	if (ovfl) {
+		//*dval = rd;
+	} else {
+		*lval = _mm_cvttss_si64(rd);
+	}
+
+	return ovfl;
+}*/
+
 
 /* php implementation */
 __int8
@@ -28,8 +65,8 @@ mult_c(__int64 a, __int64 b, __int64 *lval, double *dval)
 	return ovfl;
 }
 
-#define TESTS 10
-#define REPEAT 128
+#define TESTS 24
+#define REPEAT 16
 
 int
 main(int argc, char **argv)
@@ -38,9 +75,11 @@ main(int argc, char **argv)
 	__int8 ovfl0, ovfl1;
 	__int64 iret0, iret1;
 	double dret0, dret1;
+	__int64 delta = 0;
 
 	int i, j, repeat;
-	__int64 val[TESTS] = {1, 1024, 42, 33, 77, _I64_MAX, _I64_MIN, INT_MAX, INT_MIN, SIZE_MAX};
+	__int64 val[TESTS] = {1, 1024, 42, 33, 77, _I64_MAX, _I64_MIN, INT_MAX, INT_MIN, SIZE_MAX, 0, UINT_MAX, 13
+		-0, 1023, _I64_MAX*_I64_MAX, _I64_MIN - _I64_MIN, 12, 77, 33, 234532, -1000, 2345, -42 };
 
 	/* timing related */
 	__int64 sum = 0;
@@ -58,23 +97,44 @@ main(int argc, char **argv)
 		return;
 	}
 
+	if (2 > argc) {
+		printf("input some delta: ");
+		scanf("%I64d", &delta);
+	}
+
 	for (repeat = 0; repeat < REPEAT; repeat++)
 	for (i = 0; i < TESTS; i++) {
 		for (j = 0; j < TESTS; j++) {
 
-			__int64 elapsed_diff;
-			int rnd = rand();
+			__int64 elapsed_diff, a, b;
+			int rnd;
+			
+			srand((unsigned)time(NULL));
+			rnd = rand();
 			if (argc > 1) {
 				rnd += atoi(argv[1]);
 			}
+			else {
+				rnd += delta;
+			}
+
+			a = val[i] - rnd;
+			b = val[j] + rnd;
+			/*a = 2147452546;
+			b = 2147514748;*/
+			/*__debugbreak();*/
+
 
 			QueryPerformanceCounter((LARGE_INTEGER *)&start);
-			ovfl0 = mult(val[i]-rnd, val[j]+rnd, &iret0, &dret0);
+			ovfl0 = mult(a, b, &iret0, &dret0);
 			QueryPerformanceCounter((LARGE_INTEGER *)&end);
 			elapsed0 = end - start;
 
+			/* This will help to randomize the result, processor should become some free circles */
+			Sleep(1);
+
 			QueryPerformanceCounter((LARGE_INTEGER *)&start);
-			ovfl1 = mult_c(val[i]-rnd, val[j]+rnd, &iret1, &dret1);
+			ovfl1 = mult_c(a, b, &iret1, &dret1);
 			QueryPerformanceCounter((LARGE_INTEGER *)&end);
 			elapsed1 = end - start;
 
@@ -86,6 +146,7 @@ main(int argc, char **argv)
 
 			/* now we're sure both resulted the same overflow flag */
 			printf("ovfl %d: ", ovfl0);
+			printf("a=%I64d b=%I64d ", a, b);
 
 			elapsed_diff = elapsed0 - elapsed1;
 
