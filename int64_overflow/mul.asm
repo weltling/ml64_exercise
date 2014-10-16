@@ -28,4 +28,21 @@ ovfl:
 done:
 		ret
 	mult endp
+
+	int64_mul_ovfl proc
+		; rcx == __int64 a
+		; rdx == __int64 b
+		; r8  == __int64 *lret
+
+		xor	rax,rax
+		push	rdx
+		imul	rdx,rcx
+		mov	qword ptr[r8],rdx
+		pop	rdx
+
+		jno	done
+		add	rax,1
+done:
+		ret
+	int64_mul_ovfl endp
 end
